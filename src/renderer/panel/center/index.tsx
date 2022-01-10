@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { DragEventHandler, useRef, useState } from 'react';
 import ReactFlow, {
 	addEdge,
@@ -10,26 +11,22 @@ import ReactFlow, {
 	removeElements
 } from 'react-flow-renderer';
 import { useDispatch, useSelector } from 'react-redux';
-import { newNode, newEdge, RootState } from 'renderer/store/store';
+import { curElements, RootState, updateElements } from 'renderer/store/store';
 import styled from 'styled-components';
 
 export const Panel = () => {
+
 	const dispatch = useDispatch();
 
 	const flowWrapper = useRef(null as HTMLDivElement | null);
 
 	const [ flowInstance, setFlowInstance ] = useState(null as any);
 
-	const initialElements = useSelector((state: RootState) => {
+	const elements = useSelector((state: RootState) => curElements(state.global));
 
-  console.log("XXX", state.global);
-    return state.global.eleFocus.children || []});
+	const onConnect = (params: Edge<any> | Connection) => dispatch(updateElements(addEdge(params, elements)));
 
-	const [ elements, setElements ] = useState(initialElements);
-
-	const onConnect = (params: Edge<any> | Connection) => setElements((els) => addEdge(params, els));
-
-	const onElementsRemove = (elsToRemove: Elements<any>) => setElements((els) => removeElements(elsToRemove, els));
+	const onElementsRemove = (elsToRemove: Elements<any>) => dispatch(updateElements(removeElements(elsToRemove, elements)));
 
 	const onLoad: OnLoadFunc<any> = (_flowInstance) => setFlowInstance(_flowInstance);
 
@@ -48,12 +45,12 @@ export const Panel = () => {
 			x: event.clientX - flowBounds.left,
 			y: event.clientY - flowBounds.top
 		});
-		dispatch(newNode({
-      id: 'tempId',
+		dispatch(updateElements(elements.concat({
+      id: nanoid(),
 			type,
 			position,
 			data: { label: `${type} node` }
-		}));
+		})));
 	};
 
 	return (

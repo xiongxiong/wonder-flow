@@ -1,27 +1,36 @@
 import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import { WritableDraft } from 'immer/dist/internal';
 import { FlowElement } from 'react-flow-renderer';
 
 type FlowElementExtend<T> = FlowElement<T> & {
-  // parent?: FlowElementExtend<T>,
   children?: FlowElementExtend<T>[]
 }
 
-const eleTree: FlowElementExtend<any> = {id: 'root'} as FlowElementExtend<any>;
 const initialState = {
-  _idNext: 0,
-  eleTree: eleTree,
-  eleFocus: eleTree,
+  elements: [] as FlowElementExtend<any>[],
+  nodePath: [] as string[],
 };
-
 type InitialState = typeof initialState;
 
-const newElement = (state: WritableDraft<InitialState>, element: FlowElementExtend<any>) => {
-  if (state.eleFocus.children === undefined) {
-    state.eleFocus.children = [element];
+export const curParentNode = (state: InitialState) => {
+  let tempPath = [...state.nodePath];
+  let tempElements = state.elements as (FlowElementExtend<any>[] | undefined);
+  let tempNode = undefined;
+  let tempNodeId = tempPath.shift();
+  while (tempNodeId !== undefined) {
+    tempNode = tempElements?.find(ele => ele.id === tempNodeId);
+    tempNodeId = tempPath.shift();
+    tempElements = tempNode?.children;
+  }
+  return tempNode;
+}
+
+export const curElements = (state: InitialState) => {
+  let tempNode = curParentNode(state);
+  if (tempNode === undefined) {
+    return state.elements;
   } else {
-    state.eleFocus.children.push(element);
+    return tempNode.children || [];
   }
 }
 
@@ -29,27 +38,24 @@ export const sliceGlobal = createSlice({
 	name: 'global',
 	initialState: initialState,
 	reducers: {
-    newNode: (state, action: PayloadAction<FlowElementExtend<any>>) => {
-      newElement(state, {...action.payload, id: `node_${state._idNext++}`});
-    },
-    newEdge: (state, action: PayloadAction<FlowElementExtend<any>>) => {
-      newElement(state, {...action.payload, id: `edge_${state._idNext++}`});
-    },
+    updateElements: (state, action: PayloadAction<FlowElementExtend<any>[]>) => {
+        let tempNode = curParentNode(state);
+        if (tempNode === undefined) {
+          state.elements = action.payload;
+        } else {
+          tempNode.children = action.payload;
+        }
+      },
 		levelNext: (state, action: PayloadAction<FlowElementExtend<any>>) => {
-			if (state.eleFocus === undefined) {
-        state.eleFocus = state.eleTree;
-      }
-      state.eleFocus = action.payload;
+			state.nodePath.push(action.payload.id);
 		},
 		levelPrev: (state) => {
-      // if (state.eleFocus.parent !== undefined) {
-      //   state.eleFocus = state.eleFocus.parent;
-      // }
+            state.nodePath.pop();
 		}
 	}
 });
 
-export const { newNode, newEdge, levelNext, levelPrev } = sliceGlobal.actions;
+export const { updateElements, levelNext, levelPrev } = sliceGlobal.actions;
 
 const store = configureStore({
 	reducer: {
