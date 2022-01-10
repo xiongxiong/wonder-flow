@@ -1,70 +1,55 @@
 import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
+import { WritableDraft } from 'immer/dist/internal';
+import { FlowElement } from 'react-flow-renderer';
 
-interface Position {
-	x: number;
-	y: number;
+type FlowElementExtend<T> = FlowElement<T> & {
+  // parent?: FlowElementExtend<T>,
+  children?: FlowElementExtend<T>[]
 }
 
-interface FlowElement {
-	id: string;
-	type: string;
-	data: any;
+const eleTree: FlowElementExtend<any> = {id: 'root'} as FlowElementExtend<any>;
+const initialState = {
+  _idNext: 0,
+  eleTree: eleTree,
+  eleFocus: eleTree,
+};
+
+type InitialState = typeof initialState;
+
+const newElement = (state: WritableDraft<InitialState>, element: FlowElementExtend<any>) => {
+  if (state.eleFocus.children === undefined) {
+    state.eleFocus.children = [element];
+  } else {
+    state.eleFocus.children.push(element);
+  }
 }
-
-interface FlowNode extends FlowElement {
-	position: Position;
-}
-
-interface FlowNodeEmbeddable extends FlowNode {
-	children: FlowNode[];
-}
-
-interface FlowEdge extends FlowElement {
-	source: string;
-	target: string;
-	label: string;
-}
-
-const theMap = new Map();
-
-const theTree = new Map();
 
 export const sliceGlobal = createSlice({
 	name: 'global',
-	initialState: {
-		idNext: 0,
-		eleMap: theMap,
-		eleTree: theTree,
-		eleTreeFocus: theTree,
-		nodePath: [] as string[]
-	},
+	initialState: initialState,
 	reducers: {
-		newElement: (state, action: PayloadAction<FlowElement>) => {
-			state.idNext++;
-      state.eleTreeFocus.set(action.payload.id, new Map());
-      state.eleMap.set(action.payload.id, action.payload);
-		},
-		levelNext: (state, action: PayloadAction<FlowNodeEmbeddable>) => {
-			state.eleTreeFocus = state.eleTreeFocus.get(action.payload.id);
-			state.nodePath.push(action.payload.id);
+    newNode: (state, action: PayloadAction<FlowElementExtend<any>>) => {
+      newElement(state, {...action.payload, id: `node_${state._idNext++}`});
+    },
+    newEdge: (state, action: PayloadAction<FlowElementExtend<any>>) => {
+      newElement(state, {...action.payload, id: `edge_${state._idNext++}`});
+    },
+		levelNext: (state, action: PayloadAction<FlowElementExtend<any>>) => {
+			if (state.eleFocus === undefined) {
+        state.eleFocus = state.eleTree;
+      }
+      state.eleFocus = action.payload;
 		},
 		levelPrev: (state) => {
-			state.nodePath.pop();
-
-			let tempPath = [ ...state.nodePath ];
-			let tempTree = state.eleTree;
-			let curPos = tempPath.shift();
-			while (curPos !== undefined) {
-				tempTree = tempTree.get(curPos);
-				curPos = tempPath.shift();
-			}
-      state.eleTreeFocus = tempTree;
+      // if (state.eleFocus.parent !== undefined) {
+      //   state.eleFocus = state.eleFocus.parent;
+      // }
 		}
 	}
 });
 
-export const { newElement, levelNext, levelPrev } = sliceGlobal.actions;
+export const { newNode, newEdge, levelNext, levelPrev } = sliceGlobal.actions;
 
 const store = configureStore({
 	reducer: {
