@@ -23,6 +23,7 @@ release/build
 .erb/dll
 
 .idea
+.vscode
 npm-debug.log.*
 *.css.d.ts
 *.sass.d.ts

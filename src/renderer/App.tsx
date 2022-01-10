@@ -1,50 +1,45 @@
 import { MemoryRouter as Router, Switch, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
 import './App.css';
+import styled from 'styled-components';
+import Top from './panel/top';
+import Bottom from './panel/bottom';
+import Left from './panel/left';
+import Right from './panel/right';
+import Center from './panel/center';
 
-const Hello = () => {
+const Main = () => {
   return (
-    <div>
-      <div className="Hello">
-        <img width="200px" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
+    <Container>
+      <Top />
+      <ContainerMiddle>
+        <Left />
+        <Center />
+        <Right />
+      </ContainerMiddle>
+      <Bottom />
+    </Container>
   );
 };
 
-export default function App() {
+const App = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={Hello} />
+        <Route path="/" component={Main} />
       </Switch>
     </Router>
   );
-}
+};
+
+export default App;
+
+const Container = styled.div`
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ContainerMiddle = styled.div`
+  flex: 1;
+  display: flex;
+`;
