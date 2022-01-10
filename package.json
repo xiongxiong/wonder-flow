@@ -234,6 +234,7 @@
     "electron-updater": "^4.6.4",
     "history": "4.x.x",
     "immer": "^9.0.7",
+    "nanoid": "^3.1.30",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-flow": "^1.0.3",
