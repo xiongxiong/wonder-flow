@@ -1,29 +1,34 @@
-import { configureStore, PayloadAction } from '@reduxjs/toolkit';
-import { createSlice } from '@reduxjs/toolkit';
-import { FlowElement } from 'react-flow-renderer';
+import { configureStore, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { FlowElement } from "react-flow-renderer";
 
 type FlowElementExtend<T> = FlowElement<T> & {
-  children?: FlowElementExtend<T>[]
+  children?: FlowElementExtend<T>[];
+};
+
+interface NodeBasic {
+  id: string;
+  label: string;
 }
 
 const initialState = {
   elements: [] as FlowElementExtend<any>[],
-  nodePath: [] as string[],
+  nodePath: [] as NodeBasic[],
 };
 type InitialState = typeof initialState;
 
 export const curParentNode = (state: InitialState) => {
   let tempPath = [...state.nodePath];
-  let tempElements = state.elements as (FlowElementExtend<any>[] | undefined);
+  let tempElements = state.elements as FlowElementExtend<any>[] | undefined;
   let tempNode = undefined;
-  let tempNodeId = tempPath.shift();
-  while (tempNodeId !== undefined) {
-    tempNode = tempElements?.find(ele => ele.id === tempNodeId);
-    tempNodeId = tempPath.shift();
+  let tempNodeBasic = tempPath.shift();
+  while (tempNodeBasic !== undefined) {
+    tempNode = tempElements?.find((ele) => ele.id === tempNodeBasic?.id);
+    tempNodeBasic = tempPath.shift();
     tempElements = tempNode?.children;
   }
   return tempNode;
-}
+};
 
 export const curElements = (state: InitialState) => {
   let tempNode = curParentNode(state);
@@ -32,35 +37,52 @@ export const curElements = (state: InitialState) => {
   } else {
     return tempNode.children || [];
   }
-}
+};
 
 export const sliceGlobal = createSlice({
-	name: 'global',
-	initialState: initialState,
-	reducers: {
-    updateElements: (state, action: PayloadAction<FlowElementExtend<any>[]>) => {
-        let tempNode = curParentNode(state);
-        if (tempNode === undefined) {
-          state.elements = action.payload;
-        } else {
-          tempNode.children = action.payload;
+  name: "global",
+  initialState: initialState,
+  reducers: {
+    updateElements: (
+      state,
+      action: PayloadAction<FlowElementExtend<any>[]>
+    ) => {
+      let tempNode = curParentNode(state);
+      if (tempNode === undefined) {
+        state.elements = action.payload;
+      } else {
+        tempNode.children = action.payload;
+      }
+    },
+    levelNext: (state, action: PayloadAction<FlowElementExtend<any>>) => {
+      state.nodePath.push({
+        id: action.payload.id,
+        label: action.payload.data.label,
+      });
+    },
+    levelPrev: (state) => {
+      state.nodePath.pop();
+    },
+    levelSpec: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      let tempPath = [];
+      for (const nb of state.nodePath) {
+        tempPath.push(nb);
+        if (nb.id === id) {
+          break;
         }
-      },
-		levelNext: (state, action: PayloadAction<FlowElementExtend<any>>) => {
-			state.nodePath.push(action.payload.id);
-		},
-		levelPrev: (state) => {
-            state.nodePath.pop();
-		}
-	}
+      }
+      state.nodePath = tempPath;
+    }
+  },
 });
 
-export const { updateElements, levelNext, levelPrev } = sliceGlobal.actions;
+export const { updateElements, levelNext, levelPrev, levelSpec } = sliceGlobal.actions;
 
 const store = configureStore({
-	reducer: {
-		global: sliceGlobal.reducer
-	}
+  reducer: {
+    global: sliceGlobal.reducer,
+  },
 });
 
 export default store;
