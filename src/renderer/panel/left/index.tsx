@@ -1,13 +1,20 @@
 import styled from "styled-components";
-import { SuiteBasic } from "renderer/suite/basic";
+import suiteBasic from "renderer/suite/basic";
+import { SuiteInfo } from "renderer/suite";
+import FoldablePanel from "../common/FoldablePanel";
+import { memo } from "react";
 
-const Panel = () => (
-    <Container>
-        <SuiteBasic />
-    </Container>
-);
+const suites: SuiteInfo[] = [
+  suiteBasic
+];
 
-export { Panel as default };
+export const nodeTypes = suites.map(({nodeTypes}) => nodeTypes).reduce((a, b) => ({...a, ...b}));
+
+export default memo(() => (
+  <Container>
+      {suites.map(({name, panelRender}) => <FoldablePanel name={name} panelRender={panelRender} />)}
+  </Container>
+));
 
 const Container = styled.div`
     width: 20%;

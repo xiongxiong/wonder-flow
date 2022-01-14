@@ -1,10 +1,5 @@
 import { nanoid } from "nanoid";
-import {
-    DragEventHandler,
-    useCallback,
-    useRef,
-    useState,
-} from "react";
+import { DragEventHandler, useCallback, useRef, useState } from "react";
 import ReactFlow, {
     addEdge,
     Background,
@@ -27,6 +22,7 @@ import {
     updateElements,
 } from "renderer/store/store";
 import styled from "styled-components";
+import { nodeTypes } from "../left";
 
 export const Panel = () => {
     const dispatch = useDispatch();
@@ -43,13 +39,13 @@ export const Panel = () => {
 
     const nodePath = useSelector((state: RootState) => state.global.nodePath);
 
-    const onConnect = useCallback((params: Edge<any> | Connection) => {
+    const onConnect = (params: Edge<any> | Connection) => {
         dispatch(updateElements(addEdge(params, elements)));
-    }, []);
+    };
 
-    const onElementsRemove = useCallback((elsToRemove: Elements<any>) => {
+    const onElementsRemove = (elsToRemove: Elements<any>) => {
         dispatch(updateElements(removeElements(elsToRemove, elements)));
-    }, []);
+    };
 
     const onLoad: OnLoadFunc<any> = useCallback(
         (_flowInstance) => setFlowInstance(_flowInstance),
@@ -79,31 +75,28 @@ export const Panel = () => {
         [flowInstance]
     );
 
-    const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
-        (event) => {
-            event.preventDefault();
-            if (!flowWrapper.current) return;
+    const onDrop: DragEventHandler<HTMLDivElement> = (event) => {
+        event.preventDefault();
+        if (!flowWrapper.current) return;
 
-            const flowBounds = flowWrapper.current.getBoundingClientRect();
-            const type = event.dataTransfer.getData("application/reactflow");
-            const position = flowInstance?.project({
-                x: event.clientX - flowBounds.left,
-                y: event.clientY - flowBounds.top,
-            });
-            position &&
-                dispatch(
-                    updateElements(
-                        elements.concat({
-                            id: nanoid(),
-                            type,
-                            position,
-                            data: { label: `${type} node` },
-                        })
-                    )
-                );
-        },
-        [flowWrapper, flowInstance, elements]
-    );
+        const flowBounds = flowWrapper.current.getBoundingClientRect();
+        const type = event.dataTransfer.getData("application/reactflow");
+        const position = flowInstance?.project({
+            x: event.clientX - flowBounds.left,
+            y: event.clientY - flowBounds.top,
+        });
+        position &&
+            dispatch(
+                updateElements(
+                    elements.concat({
+                        id: nanoid(),
+                        type,
+                        position,
+                        data: { label: `${type} node` },
+                    })
+                )
+            );
+    };
 
     return (
         <ReactFlowProvider>
@@ -115,6 +108,7 @@ export const Panel = () => {
                 <FlowContainer ref={flowWrapper}>
                     <ReactFlow
                         elements={elements}
+                        nodeTypes={nodeTypes}
                         onConnect={onConnect}
                         onElementsRemove={onElementsRemove}
                         onLoad={onLoad}

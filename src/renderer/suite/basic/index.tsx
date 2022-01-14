@@ -1,34 +1,26 @@
-import { DragEvent, useCallback } from "react";
+import { DragEvent, memo, useCallback } from "react";
 import styled, { css } from "styled-components";
+import { ItemProps, ItemStyleProps, PanelProps } from "..";
+import BasicEnd from "./nodes/BasicEnd";
+import BasicStart from "./nodes/BasicStart";
 
-interface ItemStyleProps {
-    width: string;
-    height: string;
-    margin: string;
-    borderRadius: string;
-    border: string;
-}
-
-interface ItemProps {
-    type: string;
-    customStyle: ItemStyleProps;
-}
-
-const onDragStart = (event: DragEvent<HTMLDivElement>, type: string) => {
-    event.dataTransfer?.setData("application/reactflow", type);
-    event.dataTransfer && (event.dataTransfer.effectAllowed = "move");
+const createItem = (props: ItemProps) => {
+    const onDragStart = useCallback(
+        (event: DragEvent<HTMLDivElement>) => {
+            event.dataTransfer?.setData("application/reactflow", props.type);
+            event.dataTransfer && (event.dataTransfer.effectAllowed = "move");
+        },
+        [props.type]
+    );
+    return (
+        <Item
+            key={props.type}
+            customStyle={props.customStyle || {}}
+            onDragStart={onDragStart}
+            draggable
+        />
+    );
 };
-
-const createItem = (props: ItemProps) => (
-    <Item
-        key={props.type}
-        customStyle={props.customStyle || {}}
-        onDragStart={useCallback((event) => onDragStart(event, props.type), [
-            props.type,
-        ])}
-        draggable
-    />
-);
 
 const Item = styled.div.attrs({} as { customStyle: ItemStyleProps })`
     background-color: lightblue;
@@ -54,36 +46,22 @@ const itemStyle: ItemStyleProps = {
 
 const items: ItemProps[] = [
     {
-        type: "start",
+        type: "basicStart",
         customStyle: itemStyle,
     },
     {
-        type: "end",
+        type: "basicEnd",
         customStyle: itemStyle,
     },
     {
-      type: "aa",
+      type: "default",
       customStyle: itemStyle,
   },
-  {
-      type: "bb",
-      customStyle: itemStyle,
-  },
-  {
-    type: "cc",
-    customStyle: itemStyle,
-},
-{
-    type: "dd",
-    customStyle: itemStyle,
-},
 ];
 
-interface SuiteProps {}
-
-export const SuiteBasic = (props: SuiteProps) => (
+const Panel = memo((props: PanelProps) => (
     <Container>{items.map((item) => createItem(item))}</Container>
-);
+));
 
 const Container = styled.div`
     background-color: #d8d6d2;
@@ -91,3 +69,12 @@ const Container = styled.div`
     justify-content: center;
     flex-wrap: wrap;
 `;
+
+export default {
+    name: "basic",
+    panelRender: Panel,
+    nodeTypes: {
+        basicStart: BasicStart,
+        basicEnd: BasicEnd,
+    },
+};
