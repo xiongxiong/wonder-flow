@@ -23,5 +23,6 @@
   "cabal-fmt.indent": 4,
   "latex-workshop.bibtex-format.tab": "4 spaces",
   "vetur.format.options.tabSize": 4,
-  "vscode-yaml-sort.indent": 4
+"vscode-yaml-sort.indent": 4,
+"prettier.tabWidth": 4
 }
