@@ -72,7 +72,7 @@ const itemStyle: ItemStyleProps = {
     height: "40px",
     margin: "8px",
     borderRadius: "4px",
-    border: "1px solid",
+    border: "none",
 };
 
 const items: ItemProps[] = [

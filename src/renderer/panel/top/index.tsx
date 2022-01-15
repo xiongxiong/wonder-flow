@@ -6,16 +6,36 @@ import { IoIosMap } from "react-icons/io";
 import { AiOutlineFullscreen } from "react-icons/ai";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { hasSelection, removeSelection, RootState } from "renderer/store/store";
+import { RootState } from "renderer/store/store";
+import { hasSelection, removeSelection } from "renderer/store/project/data";
+import { toggleControls, toggleMiniMap } from "renderer/store/project/setting";
 
 const Panel = () => {
     const dispatch = useDispatch();
 
-    const canDelete = useSelector((state: RootState) => hasSelection(state.global));
+    const canDelete = useSelector((state: RootState) =>
+        hasSelection(state.project.data)
+    );
 
     const onDelete = useCallback(() => {
         canDelete && dispatch(removeSelection());
     }, [canDelete]);
+
+    const showControls = useSelector(
+        (state: RootState) => state.project.setting.showControls
+    );
+
+    const onToggleControls = useCallback(() => {
+        dispatch(toggleControls());
+    }, []);
+
+    const showMiniMap = useSelector(
+        (state: RootState) => state.project.setting.showMiniMap
+    );
+
+    const onToggleMiniMap = useCallback(() => {
+        dispatch(toggleMiniMap());
+    }, []);
 
     return (
         <Container>
@@ -33,10 +53,10 @@ const Panel = () => {
                 <Button>
                     <AiOutlineFullscreen />
                 </Button>
-                <Button>
+                <Button onClick={onToggleControls} selected={showControls}>
                     <AiOutlineControl />
                 </Button>
-                <Button>
+                <Button onClick={onToggleMiniMap} selected={showMiniMap}>
                     <IoIosMap />
                 </Button>
             </Group>
@@ -61,7 +81,7 @@ const Group = styled.div`
     align-items: center;
 `;
 
-const Button = styled.div.attrs({} as { disabled: boolean })`
+const Button = styled.div.attrs({} as { disabled: boolean; selected: boolean })`
     width: 32px;
     height: 32px;
     margin: 0px 4px;
@@ -84,4 +104,11 @@ const Button = styled.div.attrs({} as { disabled: boolean })`
                       background-color: white;
                   }
               `}
+
+    ${(props) =>
+        props.selected &&
+        css`
+            color: white;
+            background-color: lightskyblue;
+        `}
 `;

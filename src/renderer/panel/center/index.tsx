@@ -16,14 +16,14 @@ import ReactFlow, {
 } from "react-flow-renderer";
 import { useDispatch, useSelector } from "react-redux";
 import NavBar from "renderer/components/NavBar";
+import { RootState } from "renderer/store/store";
 import {
     curElements,
     levelNext,
     levelSpec,
-    RootState,
     updateElements,
     updateSelection,
-} from "renderer/store/store";
+} from "renderer/store/project/data";
 import styled from "styled-components";
 import { nodeTypes } from "../left";
 
@@ -37,10 +37,20 @@ export const Panel = () => {
     );
 
     const elements = useSelector((state: RootState) =>
-        curElements(state.global)
+        curElements(state.project.data)
     );
 
-    const nodePath = useSelector((state: RootState) => state.global.nodePath);
+    const nodePath = useSelector(
+        (state: RootState) => state.project.data.nodePath
+    );
+
+    const showControls = useSelector(
+        (state: RootState) => state.project.setting.showControls
+    );
+
+    const showMiniMap = useSelector(
+        (state: RootState) => state.project.setting.showMiniMap
+    );
 
     const onConnect = (params: Edge<any> | Connection) => {
         dispatch(updateElements(addEdge(params, elements)));
@@ -126,8 +136,8 @@ export const Panel = () => {
                         onSelectionChange={onSelectionChange}
                     >
                         <Background color="#aaa" gap={16} />
-                        <MiniMap />
-                        <Controls />
+                        {showMiniMap && <MiniMap />}
+                        {showControls && <Controls />}
                     </ReactFlow>
                 </FlowContainer>
             </Container>
