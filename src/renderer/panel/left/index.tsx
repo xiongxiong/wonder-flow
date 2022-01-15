@@ -12,7 +12,7 @@ export const nodeTypes = suites.map(({nodeTypes}) => nodeTypes).reduce((a, b) =>
 
 export default memo(() => (
   <Container>
-      {suites.map(({name, panelRender}) => <FoldablePanel name={name} panelRender={panelRender} />)}
+      {suites.map(({name, panelRender}) => <FoldablePanel key={name} name={name} panelRender={panelRender} />)}
   </Container>
 ));
 

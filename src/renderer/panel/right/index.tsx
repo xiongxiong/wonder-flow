@@ -1,11 +1,12 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const Container = styled.div`
-  background-color: #d8d6d2;
+    width: 20%;
+    background-color: #f7f5f1;
 `;
 
 const Panel = () => {
-  return <Container />;
+    return <Container />;
 };
 
 export { Panel as default };

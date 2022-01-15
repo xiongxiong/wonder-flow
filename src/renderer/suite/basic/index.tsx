@@ -1,24 +1,52 @@
-import { DragEvent, memo, useCallback } from "react";
+import { DragEvent, memo } from "react";
 import styled, { css } from "styled-components";
 import { ItemProps, ItemStyleProps, PanelProps } from "..";
-import BasicEnd from "./nodes/BasicEnd";
-import BasicStart from "./nodes/BasicStart";
+import BasicEnd from "./nodes/End";
+import BasicStart from "./nodes/Start";
+import BasicProcess from "./nodes/Process";
+import { MdOutlineNotStarted } from "react-icons/md";
+import { BsFillSkipEndCircleFill } from "react-icons/bs";
+import { SiNodered } from "react-icons/si";
+import { TiFlowParallel } from "react-icons/ti";
+import { AiTwotoneApi } from "react-icons/ai";
+import { CgGitBranch, CgListTree } from "react-icons/cg";
+import LogicTwo from "./nodes/LogicTwo";
+import LogicThree from "./nodes/LogicThree";
 
 const createItem = (props: ItemProps) => {
-    const onDragStart = useCallback(
-        (event: DragEvent<HTMLDivElement>) => {
-            event.dataTransfer?.setData("application/reactflow", props.type);
-            event.dataTransfer && (event.dataTransfer.effectAllowed = "move");
-        },
-        [props.type]
-    );
+    const onDragStart = (event: DragEvent<HTMLDivElement>) => {
+        event.dataTransfer?.setData("application/reactflow", props.type);
+        event.dataTransfer && (event.dataTransfer.effectAllowed = "move");
+    };
+    let ItemIcon = SiNodered;
+    switch (props.type) {
+        case "basicStart":
+            ItemIcon = MdOutlineNotStarted;
+            break;
+        case "basicEnd":
+            ItemIcon = BsFillSkipEndCircleFill;
+            break;
+        case "basicProcess":
+            ItemIcon = AiTwotoneApi;
+            break;
+        case "logicTwo":
+            ItemIcon = CgGitBranch;
+            break;
+        case "logicThree":
+            ItemIcon = CgListTree;
+            break;
+        default:
+            break;
+    }
     return (
         <Item
             key={props.type}
             customStyle={props.customStyle || {}}
             onDragStart={onDragStart}
             draggable
-        />
+        >
+            <ItemIcon />
+        </Item>
     );
 };
 
@@ -26,6 +54,9 @@ const Item = styled.div.attrs({} as { customStyle: ItemStyleProps })`
     background-color: lightblue;
     user-select: none;
     cursor: grab;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     ${(props) => css`
         width: ${props.customStyle.width};
@@ -54,9 +85,21 @@ const items: ItemProps[] = [
         customStyle: itemStyle,
     },
     {
-      type: "default",
-      customStyle: itemStyle,
-  },
+        type: "basicProcess",
+        customStyle: itemStyle,
+    },
+    {
+        type: "logicTwo",
+        customStyle: itemStyle,
+    },
+    {
+        type: "logicThree",
+        customStyle: itemStyle,
+    },
+    {
+        type: "default",
+        customStyle: itemStyle,
+    },
 ];
 
 const Panel = memo((props: PanelProps) => (
@@ -64,7 +107,7 @@ const Panel = memo((props: PanelProps) => (
 ));
 
 const Container = styled.div`
-    background-color: #d8d6d2;
+    background-color: #eeece8;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -76,5 +119,8 @@ export default {
     nodeTypes: {
         basicStart: BasicStart,
         basicEnd: BasicEnd,
+        basicProcess: BasicProcess,
+        logicTwo: LogicTwo,
+        logicThree: LogicThree,
     },
 };

@@ -11,6 +11,8 @@ import ReactFlow, {
     ReactFlowProvider,
     removeElements,
     OnLoadParams,
+    MiniMap,
+    Controls,
 } from "react-flow-renderer";
 import { useDispatch, useSelector } from "react-redux";
 import NavBar from "renderer/components/NavBar";
@@ -20,6 +22,7 @@ import {
     levelSpec,
     RootState,
     updateElements,
+    updateSelection,
 } from "renderer/store/store";
 import styled from "styled-components";
 import { nodeTypes } from "../left";
@@ -98,6 +101,10 @@ export const Panel = () => {
             );
     };
 
+    const onSelectionChange = useCallback((elements: Elements<any> | null) => {
+        dispatch(updateSelection(elements || []));
+    }, []);
+
     return (
         <ReactFlowProvider>
             <Container>
@@ -116,8 +123,11 @@ export const Panel = () => {
                         onDragOver={onDragOver}
                         onNodeDoubleClick={onNodeDoubleClick}
                         onNodeDragStop={onNodeDragStop}
+                        onSelectionChange={onSelectionChange}
                     >
                         <Background color="#aaa" gap={16} />
+                        <MiniMap />
+                        <Controls />
                     </ReactFlow>
                 </FlowContainer>
             </Container>

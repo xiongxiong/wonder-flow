@@ -1,7 +1,12 @@
-import { applyMiddleware, combineReducers, createStore, PayloadAction } from "@reduxjs/toolkit";
+import {
+    applyMiddleware,
+    combineReducers,
+    createStore,
+    PayloadAction,
+} from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
-import { FlowElement } from "react-flow-renderer";
-import logger from 'redux-logger';
+import { FlowElement, removeElements } from "react-flow-renderer";
+import logger from "redux-logger";
 
 type FlowElementExtend<T> = FlowElement<T> & {
     children?: FlowElementExtend<T>[];
@@ -14,7 +19,8 @@ interface NodeBasic {
 
 const initialState = {
     elements: [] as FlowElementExtend<any>[],
-    nodePath: [{id: 'home', label: 'Top'}] as NodeBasic[],
+    selection: [] as FlowElementExtend<any>[],
+    nodePath: [{ id: "home", label: "Top" }] as NodeBasic[],
 };
 type InitialState = typeof initialState;
 
@@ -40,6 +46,8 @@ export const curElements = (state: InitialState) => {
     }
 };
 
+export const hasSelection = (state: InitialState) => state.selection.length > 0;
+
 export const sliceGlobal = createSlice({
     name: "global",
     initialState: initialState,
@@ -55,14 +63,28 @@ export const sliceGlobal = createSlice({
                 tempNode.children = action.payload;
             }
         },
+        updateSelection: (
+            state,
+            action: PayloadAction<FlowElementExtend<any>[]>
+        ) => {
+            state.selection = action.payload;
+        },
+        removeSelection: (state) => {
+            state.elements = removeElements(
+                state.selection,
+                state.elements
+            );
+        },
         levelNext: (state, action: PayloadAction<FlowElementExtend<any>>) => {
             state.nodePath.push({
                 id: action.payload.id,
                 label: action.payload.data.label,
             });
+            state.selection = [];
         },
         levelPrev: (state) => {
             state.nodePath.pop();
+            state.selection = [];
         },
         levelSpec: (state, action: PayloadAction<string>) => {
             const id = action.payload;
@@ -74,19 +96,22 @@ export const sliceGlobal = createSlice({
                 }
             }
             state.nodePath = tempPath;
+            state.selection = [];
         },
     },
 });
 
 export const {
     updateElements,
+    updateSelection,
+    removeSelection,
     levelNext,
     levelPrev,
     levelSpec,
 } = sliceGlobal.actions;
 
 const reducers = combineReducers({
-  global: sliceGlobal.reducer,
+    global: sliceGlobal.reducer,
 });
 
 const store = createStore(reducers, applyMiddleware(logger));

@@ -7667,6 +7667,11 @@ rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-custom-events@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/react-custom-events/-/react-custom-events-1.0.5.tgz#cd928f87d4880c2f5523b6973431eca182719dbe"
+  integrity sha512-99CVIKuixXhOjWLCSkD/KwLSLV0b49NgTlCJQFOS32hgQ+Nm5oAooR+Q3y7z4AJV3YYdQ9QDd4vvuxuhmoHGEg==
+
 react-dom@^17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
