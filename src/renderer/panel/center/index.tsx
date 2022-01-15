@@ -25,7 +25,7 @@ import {
     updateSelection,
 } from "renderer/store/project/data";
 import styled from "styled-components";
-import { nodeTypes } from "../left";
+import { getNodeTypes } from "renderer/store/project/setting";
 
 export const Panel = () => {
     const dispatch = useDispatch();
@@ -35,6 +35,8 @@ export const Panel = () => {
     const [flowInstance, setFlowInstance] = useState(
         null as OnLoadParams<any> | null
     );
+
+    const nodeTypes = useSelector((state: RootState) => getNodeTypes(state.project.setting));
 
     const elements = useSelector((state: RootState) =>
         curElements(state.project.data)

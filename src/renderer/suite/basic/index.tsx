@@ -1,13 +1,12 @@
 import { DragEvent, memo } from "react";
 import styled, { css } from "styled-components";
-import { ItemProps, ItemStyleProps, PanelProps } from "..";
+import { ItemProps, PanelProps } from "..";
 import BasicEnd from "./nodes/End";
 import BasicStart from "./nodes/Start";
 import BasicProcess from "./nodes/Process";
 import { MdOutlineNotStarted } from "react-icons/md";
 import { BsFillSkipEndCircleFill } from "react-icons/bs";
 import { SiNodered } from "react-icons/si";
-import { TiFlowParallel } from "react-icons/ti";
 import { AiTwotoneApi } from "react-icons/ai";
 import { CgGitBranch, CgListTree } from "react-icons/cg";
 import LogicTwo from "./nodes/LogicTwo";
@@ -41,7 +40,6 @@ const createItem = (props: ItemProps) => {
     return (
         <Item
             key={props.type}
-            customStyle={props.customStyle || {}}
             onDragStart={onDragStart}
             draggable
         >
@@ -50,55 +48,42 @@ const createItem = (props: ItemProps) => {
     );
 };
 
-const Item = styled.div.attrs({} as { customStyle: ItemStyleProps })`
-    background-color: lightblue;
+const Item = styled.div.attrs({} as { })`
+    background-color: white;
     user-select: none;
     cursor: grab;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 40px;
+    height: 40px;
+    margin: 8px;
+    border-radius: 4px;
+    border: none;
 
-    ${(props) => css`
-        width: ${props.customStyle.width};
-        height: ${props.customStyle.height};
-        margin: ${props.customStyle.margin};
-        border-radius: ${props.customStyle.borderRadius};
-        border: ${props.customStyle.border};
-    `}
+    &:hover {
+      background-color: lightblue;
+    }
 `;
-
-const itemStyle: ItemStyleProps = {
-    width: "40px",
-    height: "40px",
-    margin: "8px",
-    borderRadius: "4px",
-    border: "none",
-};
 
 const items: ItemProps[] = [
     {
         type: "basicStart",
-        customStyle: itemStyle,
     },
     {
         type: "basicEnd",
-        customStyle: itemStyle,
     },
     {
         type: "basicProcess",
-        customStyle: itemStyle,
     },
     {
         type: "logicTwo",
-        customStyle: itemStyle,
     },
     {
         type: "logicThree",
-        customStyle: itemStyle,
     },
     {
         type: "default",
-        customStyle: itemStyle,
     },
 ];
 
@@ -115,7 +100,7 @@ const Container = styled.div`
 
 export default {
     name: "basic",
-    panelRender: Panel,
+    PanelRender: Panel,
     nodeTypes: {
         basicStart: BasicStart,
         basicEnd: BasicEnd,

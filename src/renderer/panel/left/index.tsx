@@ -1,20 +1,23 @@
 import styled from "styled-components";
-import suiteBasic from "renderer/suite/basic";
-import { SuiteInfo } from "renderer/suite";
 import FoldablePanel from "../common/FoldablePanel";
 import { memo } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "renderer/store/store";
 
-const suites: SuiteInfo[] = [
-  suiteBasic
-];
+export default memo(() => {
+    const suitePanels = useSelector((state: RootState) => state.project.setting.suitePanels);
 
-export const nodeTypes = suites.map(({nodeTypes}) => nodeTypes).reduce((a, b) => ({...a, ...b}));
-
-export default memo(() => (
-  <Container>
-      {suites.map(({name, panelRender}) => <FoldablePanel key={name} name={name} panelRender={panelRender} />)}
-  </Container>
-));
+    return (
+        <Container>
+            {suitePanels.map((suitePanel) => (
+                <FoldablePanel
+                    key={suitePanel.info.name}
+                    suitePanel={suitePanel}
+                />
+            ))}
+        </Container>
+    );
+});
 
 const Container = styled.div`
     width: 20%;

@@ -4,6 +4,7 @@ import { AiOutlineControl } from "react-icons/ai";
 import { RiSave3Fill } from "react-icons/ri";
 import { IoIosMap } from "react-icons/io";
 import { AiOutlineFullscreen } from "react-icons/ai";
+import { BiPrinter } from "react-icons/bi";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "renderer/store/store";
@@ -58,6 +59,9 @@ const Panel = () => {
                 </Button>
                 <Button onClick={onToggleMiniMap} selected={showMiniMap}>
                     <IoIosMap />
+                </Button>
+                <Button>
+                    <BiPrinter />
                 </Button>
             </Group>
         </Container>
